@@ -12,9 +12,9 @@ namespace MyRhinoPlugin2
      
 
 
-    public class CreateRandLayers_Error : Command
+    public class CreateRandLayers : Command
     {
-        public CreateRandLayers_Error()
+        public CreateRandLayers()
         {
             // Rhino only creates one instance of each command class defined in a
             // plug-in, so it is safe to store a refence in a static property.
@@ -22,40 +22,34 @@ namespace MyRhinoPlugin2
         }
 
         ///<summary>The only instance of this command.</summary>
-        public static CreateRandLayers_Error Instance { get; private set; }
+        public static CreateRandLayers Instance { get; private set; }
 
         ///<returns>The command name as it appears on the Rhino command line.</returns>
-        public override string EnglishName => "CreateRandLayers_Error";
+        public override string EnglishName => "CreateRandLayers";
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
-            // TODO: start here modifying the behaviour of your command.
-            // ---
-            // Disable redrawing of the document views
-            //doc.Views.RedrawEnabled = false;
 
             // Start a background task
             Task.Run(() =>
             {
-
-                doc.Views.RedrawEnabled = false;
-
-                for ( int i = 0; i < 10; i++ )
+                RhinoApp.InvokeOnUiThread((System.Action) (() =>
                 {
-                    var layername = $"Building::{i}_{System.Guid.NewGuid()}";
-                    int layerIndex = stuff.addLayerByFullPath(doc, layername.ToString(), System.Drawing.Color.DarkBlue);
-                }
+
+                    doc.Views.RedrawEnabled = false;
+
+                    for ( int i = 0; i < 10; i++ )
+                    {
+                        var layername = $"Building::{i}_{System.Guid.NewGuid()}";
+                        int layerIndex = stuff.addLayerByFullPath(doc, layername.ToString(), System.Drawing.Color.DarkBlue);
+                    }
 
 
-                doc.Views.RedrawEnabled = true;
-                doc.Views.Redraw();
-
-
-
-               
+                    doc.Views.RedrawEnabled = true;
+                    doc.Views.Redraw();
+                }));
 
             });
-
 
             return Result.Success;
         }
